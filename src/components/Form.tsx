@@ -4,6 +4,11 @@ import { KonyvContext } from "../contexts/KonyvesBoltContext";
 
 function Form() {
   const context = useContext(KonyvContext);
+  if (!context) {
+    return null 
+  }
+  const { szerkesztendoKonyv } = context
+  
 
   const [ujKonyv, setUjKonyv] = useState({
     cim: "",

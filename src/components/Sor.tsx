@@ -48,6 +48,12 @@ export default function Sor({ konyv }: SorProps) {
                 >
                     Törlés
                 </button>
+                <button
+                    onClick={() =>context.szerkesztesInditas(konyv.id) }
+                    className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-600 transition-all hover:border-red-300 hover:bg-red-50 active:scale-95"
+                >
+                    Szerkesztés
+                </button>
             </td>
 
         </tr>
