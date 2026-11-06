@@ -1,21 +1,34 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { KonyvContext } from "../contexts/KonyvesBoltContext";
 
 function Form() {
   const context = useContext(KonyvContext);
-  if (!context) {
-    return null 
-  }
-  const { szerkesztendoKonyv } = context
-  
-
   const [ujKonyv, setUjKonyv] = useState({
     cim: "",
     szerzo: "",
     ar: 0,
     darabszam: 0,
   });
+
+  const szerkesztendoKonyv = context?.szerkesztendoKonyv;
+
+  /* React egyik Hookja, amivel mellékhatásokat (side effecteket) tudunk kezelni a komponenseinkben.
+  Akkor használjuk, amikor azt szeretnénk, hogy valami automatikusan megtörténjen egy bizonyos állapot vagy adat változásakor. */
+  useEffect(() => {
+    if (szerkesztendoKonyv) {
+      setUjKonyv({
+        cim: szerkesztendoKonyv.cim,
+        szerzo: szerkesztendoKonyv.szerzo,
+        ar: szerkesztendoKonyv.ar,
+        darabszam: szerkesztendoKonyv.darabszam,
+      });
+    }
+  }, [szerkesztendoKonyv]);
+
+  if (!context) {
+    return null;
+  }
 
   function adatValtozas(e: ChangeEvent<HTMLInputElement>) {
     const { name, value, type } = e.target;
@@ -30,7 +43,14 @@ function Form() {
 
     if (!context) return;
 
-    context.konyvHozzaadas(ujKonyv);
+    if (szerkesztendoKonyv) {
+      context.konyvModositas({
+        ...ujKonyv,
+        id: szerkesztendoKonyv.id,
+      });
+    } else {
+      context.konyvHozzaadas(ujKonyv);
+    }
 
     setUjKonyv({
       cim: "",
@@ -44,11 +64,13 @@ function Form() {
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900">
-          Új könyv hozzáadása
+          {szerkesztendoKonyv ? "Könyv szerkesztése" : "Új könyv hozzáadása"}
         </h2>
 
         <p className="mt-1 text-sm text-slate-500">
-          Töltsd ki az adatokat az új könyv rögzítéséhez.
+          {szerkesztendoKonyv
+            ? "Módosítsd a könyv adatait."
+            : "Töltsd ki az adatokat az új könyv rögzítéséhez."}
         </p>
       </div>
 
@@ -143,7 +165,7 @@ function Form() {
           type="submit"
           className="w-full rounded-lg bg-amber-200 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-amber-300 active:scale-[0.98]"
         >
-          Könyv mentése
+          {szerkesztendoKonyv ? "Módosítás mentése" : "Könyv mentése"}
         </button>
       </form>
     </div>
